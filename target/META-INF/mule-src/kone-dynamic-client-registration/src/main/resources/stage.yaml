@@ -1,0 +1,16 @@
+######################  Kone Application config prop ######################
+mule:
+  listening:
+    port: "8081"
+    
+
+encryptionPassword: "![<PW>]"
+
+
+###################### Kone config properties #########################################
+
+kone:
+  host: "<SF_HOST>.salesforce.com"
+  port: "443"
+  grant_type: ["authorization_code","implicit","refresh_token"]
+  authcode: "<AUTH_CODE>"

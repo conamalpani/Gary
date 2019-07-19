@@ -1,0 +1,17 @@
+{
+  "redirect_uris": [
+    "http://anypoint.com/test"
+  ],
+  "grant_types": [
+    "implicit",
+    "authorization_code",
+    "refresh_token"
+  ],
+  "token_endpoint_auth_method": "client_secret_basic",
+  "response_types": [
+    "token",
+    "id_token",
+    "code"
+  ],
+  "client_name": "Akhilesh Perla"
+}

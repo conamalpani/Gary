@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="kone-dynamic-client-registration" doc:id="7222a6a4-53de-40ff-bdc9-38187ec2c30c" >
+		<http:listener doc:name="Listener" doc:id="c454b5e1-d380-45d2-9d0a-f269fa8fc012" config-ref="HTTP_Listener_config" path="/mule-dynamic-client-registration"/>
+		<ee:transform doc:name="Transform Message" doc:id="91165a1f-526d-46ca-a422-e3a1b18848d2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	redirect_uris: if(not isEmpty(payload.redirect_uris)) (payload.redirect_uris map ( redirecturi , indexOfRedirecturi ) -> redirecturi replace "http" with ("https")) else ["https://kone.com"],
+	//grant_types: payload.grant_types map ( granttype , indexOfGranttype ) -> granttype,
+	grant_types: ('${kone.grant_type}') splitBy(","),
+	token_endpoint_auth_method: payload.token_endpoint_auth_method,
+	response_types: payload.response_types map ( responsetype , indexOfResponsetype ) -> responsetype,
+	client_name: payload.client_name
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="authorization" ><![CDATA[%dw 2.0
+output application/java
+---
+"Bearer " ++ '${kone.authcode}']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:request method="POST" doc:name="Call Salesforce" doc:id="6b0819db-9188-4fa1-afed-c93429fc01be" config-ref="HTTP_Request_configuration" path="/services/oauth2/register" requestStreamingMode="NEVER">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Content-Type" : "application/json",
+	"Authorization" : vars.authorization
+}]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Response Message" doc:id="7aa05783-0fb0-439e-80e3-6915a16bd269" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="Logger" doc:id="255f4f10-9c5c-47d5-a221-5b1aba5006e3" message="Response Payload: #[payload]"/>
+	</flow>
+</mule>

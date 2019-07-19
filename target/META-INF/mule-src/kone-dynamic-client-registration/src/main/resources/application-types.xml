@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="client-registration-rq" format="json">
+      <types:shape format="weave" example="examples/client-registration-rq.json"><![CDATA[%dw 2.0
+type client_registration_rq = {|
+  redirect_uris: Array<String>, 
+  grant_types: Array<String>, 
+  token_endpoint_auth_method: String, 
+  response_types: Array<String>, 
+  client_name: String
+|} {"MetadataFormat": "json",
+"example": "{\"redirect_uris\":[\"http:\/\/anypoint.com\/test\"],\"grant_types\":[\"implicit\",\"authorization_code\",\"refresh_token\"],\"token_endpoint_auth_method\":\"client_secret_basic\",\"response_types\":[\"token\",\"id_token\",\"code\"],\"client_name\":\"Akhilesh Perla\"}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#91165a1f-526d-46ca-a422-e3a1b18848d2">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="client-registration-rq"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="client-registration-rq"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>
